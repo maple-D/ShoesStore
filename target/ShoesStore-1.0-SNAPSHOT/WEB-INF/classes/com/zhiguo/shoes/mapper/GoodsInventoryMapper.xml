@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiguo.shoes.mapper.GoodsInventoryMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiguo.shoes.pojo.GoodsInventory" >
+    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_size" property="goodsSize" jdbcType="INTEGER" />
+    <result column="goods_count" property="goodsCount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_id, goods_size, goods_count
+  </sql>
+  <insert id="saveBatch" parameterType="java.util.List" >
+    insert into goodsinventory (goods_id, goods_size, goods_count
+      )
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.goodsId,jdbcType=VARCHAR}, #{item.goodsSize,jdbcType=INTEGER}, #{item.goodsCount,jdbcType=INTEGER}
+      )
+    </foreach>
+  </insert>
+  <select id="queryInventoryWithIdAndSize" resultType="java.lang.Integer" parameterType="com.zhiguo.shoes.pojo.GoodsInventory">
+    SELECT  goods_count FROM goodsinventory WHERE goods_id = #{goodsId} AND goods_size = #{goodsSize}
+  </select>
+</mapper>

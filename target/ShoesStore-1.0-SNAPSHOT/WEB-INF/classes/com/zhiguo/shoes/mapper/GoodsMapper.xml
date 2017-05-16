@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiguo.shoes.mapper.GoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiguo.shoes.pojo.Goods" >
+    <id column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goods_gender" property="goodsGender" jdbcType="VARCHAR" />
+    <result column="goods_picture" property="goodsPicture" jdbcType="VARCHAR" />
+    <result column="goods_cost_price" property="goodsCostPrice" jdbcType="DECIMAL" />
+    <result column="goods_sale_price" property="goodsSalePrice" jdbcType="DECIMAL" />
+    <result column="goods_description" property="goodsDescription" jdbcType="VARCHAR" />
+    <result column="goods_sold" property="goodsSold" jdbcType="INTEGER" />
+    <result column="goods_status" property="goodsStatus" jdbcType="VARCHAR" />
+    <result column="goods_upload_time" property="goodsUploadTime" jdbcType="TIMESTAMP" />
+    <association property="goodsType" javaType="com.zhiguo.shoes.pojo.GoodsType" column="goods_type_id">
+      <id column="goods_type_id" property="goodsTypeId"/>
+      <result column="goods_type_name" property="goodsTypeName"/>
+    </association>
+    <association property="admin" javaType="com.zhiguo.shoes.pojo.Admin">
+      <id column="admin_id" property="adminId"/>
+      <result column="admin_name" property="adminName"/>
+    </association>
+    <collection property="goodsInventoryList" ofType="com.zhiguo.shoes.pojo.GoodsInventory" column="goods_id">
+      <id column="goods_size" property="goodsSize"/>
+      <result column="goods_count" property="goodsCount"/>
+    </collection>
+  </resultMap>
+  <insert id="insert" parameterType="com.zhiguo.shoes.pojo.Goods">
+    insert into goods (goods_id, goods_name, goods_gender,
+      goods_type_id, goods_picture, goods_cost_price,
+      goods_sale_price, goods_description,
+      goods_admin_id, goods_sold, goods_status,
+      goods_upload_time)
+    values (#{goodsId,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, #{goodsGender,jdbcType=VARCHAR},
+      #{goodsType.goodsTypeId}, #{goodsPicture,jdbcType=VARCHAR}, #{goodsCostPrice,jdbcType=DECIMAL},
+      #{goodsSalePrice,jdbcType=DECIMAL}, #{goodsDescription,jdbcType=VARCHAR},
+      #{admin.adminId}, #{goodsSold,jdbcType=INTEGER}, #{goodsStatus,jdbcType=VARCHAR},
+      #{goodsUploadTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <select id="queryGoodsList" parameterType="com.zhiguo.shoes.pojo.Page" resultMap="BaseResultMap">
+   SELECT * FROM ( SELECT * FROM goods  limit #{startCount},#{pageSize}) g,goodsinventory i WHERE g.goods_id = i.goods_id  ;
+  </select>
+
+  <select id="queryAllGoodsCount"
+          resultType="java.lang.Integer">
+    SELECT COUNT(goods_id) FROM goods
+  </select>
+
+  <select id="queryGoodsWithId" parameterType="java.lang.String" resultMap="BaseResultMap">
+  SELECT * FROM goods g,goodsinventory i,goodstype t WHERE g.goods_id = i.goods_id AND g.goods_type_id = t.goods_type_id AND g.goods_id = #{goodsId};
+</select>
+</mapper>

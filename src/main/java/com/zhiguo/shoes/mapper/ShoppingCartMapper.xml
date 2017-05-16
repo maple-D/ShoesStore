@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiguo.shoes.mapper.ShoppingCartMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiguo.shoes.pojo.ShoppingCart" >
+    <id column="cart_id" property="cartId" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="cart_goods_count" property="cartGoodsCount" jdbcType="INTEGER" />
+    <result column="subtotal" property="subtotal" jdbcType="DECIMAL" />
+    <association property="goods" javaType="com.zhiguo.shoes.pojo.Goods">
+      <id column="goods_id" property="goodsId"  />
+      <result column="goods_name" property="goodsName" />
+      <result column="goods_picture" property="goodsPicture" />
+      <result column="goods_sale_price" property="goodsSalePrice" />
+    </association>
+    <association property="goodsInventory" javaType="com.zhiguo.shoes.pojo.GoodsInventory">
+      <id column="goods_id" property="goodsId"  />
+      <result column="goods_size" property="goodsSize" />
+      <result column="goods_count" property="goodsCount" />
+    </association>
+  </resultMap>
+  <delete id="deletewithCartId" parameterType="java.lang.Integer" >
+    delete from shoppingcart
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deletewithCartIds" parameterType="java.lang.Integer" >
+    delete from shoppingcart
+    where cart_id IN
+    <foreach item="item" collection="array" open="(" separator="," close=")">
+       #{item}
+    </foreach>
+  </delete>
+
+  <select id="queryWithUserAndGoodsIdAndSize" parameterType="com.zhiguo.shoes.pojo.ShoppingCart" resultMap="BaseResultMap">
+    SELECT cart_id FROM shoppingcart WHERE userid = #{userid} and goods_id = #{goods.goodsId} and goods_size = #{goodsInventory.goodsSize}
+  </select>
+
+  <insert id="saveShoopingCart" parameterType="com.zhiguo.shoes.pojo.ShoppingCart" keyProperty="cart_id" useGeneratedKeys="true" >
+    insert into shoppingcart ( userid, goods_id,
+      goods_size, cart_goods_count,subtotal)
+    values ( #{userid,jdbcType=INTEGER}, #{goods.goodsId,jdbcType=VARCHAR},
+      #{goodsInventory.goodsSize,jdbcType=INTEGER}, #{cartGoodsCount,jdbcType=INTEGER},
+      cart_goods_count * (SELECT goods_sale_price from goods where goods.goods_id = #{goods.goodsId})
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zhiguo.shoes.pojo.ShoppingCart" >
+    update shoppingcart
+    set  cart_goods_count = cart_goods_count + #{cartGoodsCount},subtotal = cart_goods_count *
+     (SELECT goods_sale_price from goods where goods.goods_id = shoppingcart.goods_id)
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </update>
+  <update id="updateCartGoodsCountWithCartId"  parameterType="com.zhiguo.shoes.pojo.ShoppingCart" >
+    update shoppingcart
+    set  cart_goods_count =  #{cartGoodsCount},subtotal = cart_goods_count *
+     (SELECT goods_sale_price from goods where goods.goods_id = shoppingcart.goods_id)
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </update>
+  <select id="queryShoppingCartWithUserid" resultMap="BaseResultMap"  parameterType="java.lang.Integer" >
+    SELECT *     FROM shoppingcart s,goods g, goodsinventory i
+     where s.userid = #{userid} and s.goods_id = g.goods_id and s.goods_id = i.goods_id and i.goods_size = s.goods_size
+  </select>
+  <select id="queryShoppingCartWithcartIds" resultMap="BaseResultMap"   >
+    SELECT *     FROM shoppingcart s,goods g, goodsinventory i
+     where  s.goods_id = g.goods_id and s.goods_id = i.goods_id and i.goods_size = s.goods_size and
+     s.cart_id IN
+     <foreach item="item" collection="array" open="(" separator="," close=")">
+       #{item}
+     </foreach>
+  </select>
+  <select id="queryCountWithCartId" resultType="java.lang.Integer"  parameterType="java.lang.Integer" >
+    SELECT cart_goods_count FROM shoppingcart
+     where cart_id = #{cartId,jdbcType=INTEGER}
+  </select>
+  <select id="querySubtotalWithCartId" resultType="java.lang.Double"  parameterType="java.lang.Integer" >
+    SELECT subtotal FROM shoppingcart
+     where cart_id = #{cartId,jdbcType=INTEGER}
+  </select>
+</mapper>

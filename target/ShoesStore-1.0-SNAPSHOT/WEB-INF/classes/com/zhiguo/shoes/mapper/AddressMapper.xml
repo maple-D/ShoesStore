@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiguo.shoes.mapper.AddressMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiguo.shoes.pojo.Address" >
+    <id column="address_id" property="addressId" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="consignee" property="consignee" jdbcType="VARCHAR" />
+    <result column="address_phone" property="addressPhone" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="particular_address" property="particularAddress" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    address_id, userid, consignee, address_phone,province,city, area, particular_address, postcode
+  </sql>
+  <select id="queryAddressWithUserid" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from address
+    where userid = #{userid,jdbcType=INTEGER}
+  </select>
+  <select id="queryWithAddressId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from address
+    where address_id = #{addressId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteWithAddressId" parameterType="java.lang.Integer" >
+    delete from address
+    where address_id = #{addressId,jdbcType=INTEGER}
+  </delete>
+  <insert id="saveAddress" parameterType="com.zhiguo.shoes.pojo.Address" keyProperty="address_id" useGeneratedKeys="true" >
+    insert into address ( userid, consignee,
+      address_phone,province,city, area, particular_address,
+      postcode)
+    values ( #{userid,jdbcType=INTEGER}, #{consignee,jdbcType=VARCHAR},
+      #{addressPhone,jdbcType=VARCHAR},#{province},#{city}, #{area,jdbcType=VARCHAR}, #{particularAddress,jdbcType=VARCHAR},
+      #{postcode,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateWithAdressId" parameterType="com.zhiguo.shoes.pojo.Address" >
+    update address
+    set
+      consignee = #{consignee,jdbcType=VARCHAR},
+      address_phone = #{addressPhone,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      particular_address = #{particularAddress,jdbcType=VARCHAR},
+      postcode = #{postcode,jdbcType=VARCHAR}
+    where address_id = #{addressId,jdbcType=INTEGER}
+  </update>
+</mapper>

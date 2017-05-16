@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiguo.shoes.mapper.GoodsTypeMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiguo.shoes.pojo.GoodsType" >
+    <id column="goods_type_id" property="goodsTypeId" jdbcType="INTEGER" />
+    <result column="goods_type_name" property="goodsTypeName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_type_id, goods_type_name
+  </sql>
+  <select id="queryAllGoodsType" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from goodstype
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from goodstype
+    where goods_type_id = #{goodsTypeId,jdbcType=INTEGER}
+  </select>
+</mapper>
